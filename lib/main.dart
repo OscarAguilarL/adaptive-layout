@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:adaptive_layout/src/people.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        visualDensity: const VisualDensity(horizontal: 4, vertical: 4.0),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -41,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context, constraints) {
           if (constraints.maxWidth > 600) {
             return const WideLayout();
+            // TODO: insert a layout between 400 and 600 that is a grid of photos
           } else {
             return const NarrowLayout();
           }
@@ -64,10 +67,14 @@ class _WideLayoutState extends State<WideLayout> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          flex: 2,
-          child: PeopleList(
-              onPersonTap: (person) => setState(() => _person = person)),
+        SizedBox(
+          width: 250,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: PeopleList(
+              onPersonTap: (person) => setState(() => _person = person),
+            ),
+          ),
         ),
         Expanded(
           flex: 3,
@@ -123,14 +130,43 @@ class PersonDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(person.name),
-          Text(person.phone),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (constraints.maxHeight > 200) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                MouseRegion(
+                  onHover: ((event) {
+                    print('hello world');
+                  }),
+                  child: Text(person.name),
+                ),
+                Text(person.phone),
+                ElevatedButton(
+                  onPressed: () => {},
+                  child: const Text('Contact me'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          return Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(person.name),
+                Text(person.phone),
+                ElevatedButton(
+                  onPressed: () => {},
+                  child: const Text('Contact me'),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 }
